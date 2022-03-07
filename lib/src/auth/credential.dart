@@ -39,33 +39,7 @@ class Certificate {
     var clientEmail = json['client_email'];
     if (clientEmail is! String) clientEmail = null;
 
-    var v = parsePem(privateKey).first;
-    var keyPair = (v is PrivateKeyInfo) ? v.keyPair : (v as KeyPair?)!;
-    var pKey = keyPair.privateKey as RsaPrivateKey;
-
-    String _bytesToBase64(List<int> bytes) {
-      return base64Url.encode(bytes).replaceAll('=', '');
-    }
-
-    String _intToBase64(BigInt v) {
-      return _bytesToBase64(v
-          .toRadixString(16)
-          .replaceAllMapped(RegExp('[0-9a-f]{2}'), (m) => '${m.group(0)},')
-          .split(',')
-          .where((v) => v.isNotEmpty)
-          .map((v) => int.parse(v, radix: 16))
-          .toList());
-    }
-
-    var k = JsonWebKey.fromJson({
-      'kty': 'RSA',
-      'n': _intToBase64(pKey.modulus),
-      'd': _intToBase64(pKey.privateExponent),
-      'p': _intToBase64(pKey.firstPrimeFactor),
-      'q': _intToBase64(pKey.secondPrimeFactor),
-      'alg': 'RS256',
-      'kid': json['private_key_id']
-    });
+    var k = JsonWebKey.fromPem(privateKey);
 
     return Certificate(
         projectId: json['project_id'], privateKey: k, clientEmail: clientEmail);
