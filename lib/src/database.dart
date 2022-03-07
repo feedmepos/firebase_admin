@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:firebase_admin/src/service.dart';
 
-import '../firebase_admin.dart';
 import 'app/app.dart';
 import 'app/app_extension.dart';
 import 'app.dart';
@@ -16,14 +15,12 @@ class _AuthTokenProvider implements AuthTokenProvider {
 
   @override
   Future<String?> getToken([bool forceRefresh = false]) async {
-    print('getToken');
-    print((await internals.getToken(forceRefresh)).accessToken);
     return (await internals.getToken(forceRefresh)).accessToken;
   }
 
   @override
-  Stream<String?> get onTokenChanged {
-    var controller = StreamController<String?>();
+  Stream<Future<String>?> get onTokenChanged {
+    var controller = StreamController<Future<String>?>();
     var listener = (v) => controller.add(v);
 
     controller.onListen = () {
